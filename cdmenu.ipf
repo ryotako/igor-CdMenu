@@ -168,7 +168,7 @@ End
 // Current Directory ///////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 static Function/S MenuItem_CurrentDir()
-	return GetDataFolder(1)
+	return "\M0"+GetDataFolder(1)
 End
 
 static Function MenuCommand_CurrentDir()
@@ -188,12 +188,15 @@ static Function/S MenuItem_ParentDir(i)
 	for(;i>=0;i-=1)
 		path = RemoveListItem(ItemsInList(path,":")-1,path,":")
 	endfor
-	return path
+	return "\\M0"+path
 End
 
 static Function MenuCommand_ParentDir(i)
 	Variable i
-	cd $MenuItem_ParentDir(i)
+	do
+		cd	::
+		i-=1
+	while(i>=0)
 End
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -206,13 +209,13 @@ End
 static Function/S MenuItem_ChildDir(i)
 	Variable i
 	if(CountObjects(":",4))
-		return GetIndexedObjName(":",4,i)
+		return "\\M0"+GetIndexedObjName(":",4,i)
 	endif
 End
 
 static Function MenuCommand_ChildDir(i)
 	Variable i
-	cd $MenuItem_ChildDir(i)
+	cd $":"+PossiblyQuoteName(GetIndexedObjName(":",4,i))
 End
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -226,11 +229,15 @@ static Function/S MenuItem_NeighborDir(i)
 	Variable i
 	if(CountObjects("::",4))
 		String name = GetIndexedObjName("::",4,i)
-		return SelectString(cmpstr(name,GetDataFolder(0)),"!"+num2char(18),"")+name
+		if(cmpstr(PossiblyQuoteName(name),GetDataFolder(0)) == 0)
+			return "\\M0:!"+num2char(18)+":"+name	
+		else
+			return "\\M0"+name	
+		endif		
 	endif
 End
 
 static Function MenuCommand_NeighborDir(i)
 	Variable i
-	cd $"::"+GetIndexedObjName("::",4,i)
+	cd $"::"+PossiblyQuoteName(GetIndexedObjName("::",4,i))
 End
